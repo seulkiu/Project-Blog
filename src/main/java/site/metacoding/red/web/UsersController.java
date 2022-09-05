@@ -28,11 +28,11 @@ public class UsersController {
 		return "redirect:/";
 	}
 	
-	@PostMapping("/login") // 로그인만 예외로 select인데 poast로 함.
+	@PostMapping("/login") // 로그인만 예외로 select인데 post로 함.
 	public String login(LoginDto loginDto) {
 		Users usersPS = usersDao.login(loginDto); // DB에서 들고온건 PS를 붙여줌
 		if (usersPS != null) {// 로그인 인증됨.
-			session.setAttribute("principal", usersPS);
+			session.setAttribute("principal", usersPS); //usersPS=object타입
 			//principal-인증된 유저
 			return "redirect:/"; // boards의 main
 		} else { // 인증안됨.
