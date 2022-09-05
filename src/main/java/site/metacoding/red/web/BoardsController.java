@@ -45,7 +45,7 @@ public class BoardsController {
 	
 	// http://localhost:8000/
 	// http://localhost:8000/?page=0
-	@GetMapping({"/", "/boards"})
+	@GetMapping({"/", "/boards"}) // 메인페이지
 	public String getBoardList(Model model, Integer page) { // 0 -> 0, 1->10, 2->20
 		if(page == null) page = 0;
 		int startNum = page * 10;
@@ -54,11 +54,12 @@ public class BoardsController {
 		return "boards/main";
 	}
 	
-	@GetMapping("/boards/{id}")
+	@GetMapping("/boards/{id}") // 상세보기
 	public String getBoardList(@PathVariable Integer id, Model model) {
 		model.addAttribute("boards", boardsDao.findById(id));
 		return "boards/detail";
 	}
+	
 	
 	@GetMapping("/boards/writeForm")
 	public String writeForm() {
