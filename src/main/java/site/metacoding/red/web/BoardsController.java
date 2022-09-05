@@ -14,9 +14,9 @@ import lombok.RequiredArgsConstructor;
 import oracle.jdbc.proxy.annotation.Post;
 import site.metacoding.red.domain.boards.Boards;
 import site.metacoding.red.domain.boards.BoardsDao;
-import site.metacoding.red.domain.boards.mapper.MainView;
 import site.metacoding.red.domain.users.Users;
 import site.metacoding.red.web.dto.request.boards.WriteDto;
+import site.metacoding.red.web.dto.response.boards.MainDto;
 
 @RequiredArgsConstructor
 @Controller
@@ -49,13 +49,14 @@ public class BoardsController {
 
 	@GetMapping({ "/", "/boards" }) // 메인페이지
 	public String getBoardList(Model model) {
-		List<MainView> boardsList = boardsDao.findAll();
+		List<MainDto> boardsList = boardsDao.findAll();
 		model.addAttribute("boardsList", boardsList);
 		return "boards/main";
 	}
 
 	@GetMapping("/boards/{id}") // 상세보기
-	public String getBoardList(@PathVariable Integer id) {
+	public String getBoardList(@PathVariable Integer id, Model model) {
+		model.addAttribute("boards", boardsDao.findById(id));
 		return "boards/detail";
 	}
 
