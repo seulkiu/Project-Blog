@@ -5,7 +5,7 @@
 
 <div class="container">
 	<br /> <br />
-	<div}>
+	<div>
 		<h3 >${boards.title }</h3>
 	</div>
 	<hr/>

@@ -9,12 +9,12 @@
 		VALUES(boards_seq.nextval, #{title}, #{content}, #{usersId}, sysdate)
 	</insert>
 
-	<select id="findById" resultType="site.metacoding.red.domain.boards.mapper.MainView">
+	<select id="findById" resultType="site.metacoding.red.domain.boards.Boards">
 		SELECT title, content
-		FROM boards WHERE = ${id}
+		FROM boards WHERE id = #{id}
 	</select>
 	
-	<select id="findAll" resultType="site.metacoding.red.web.dto.reponse.boards.MainDto">
+	<select id="findAll" resultType="site.metacoding.red.web.dto.response.boards.MainDto">
 		SELECT b.id, b.title, u.username
 		FROM boards b
 		INNER JOIN users u

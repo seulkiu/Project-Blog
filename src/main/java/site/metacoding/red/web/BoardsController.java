@@ -56,7 +56,8 @@ public class BoardsController {
 
 	@GetMapping("/boards/{id}") // 상세보기
 	public String getBoardList(@PathVariable Integer id, Model model) {
-		model.addAttribute("boards", boardsDao.findById(id));
+		Boards boards = boardsDao.findById(id);
+		model.addAttribute("boards", boards);
 		return "boards/detail";
 	}
 
