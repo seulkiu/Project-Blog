@@ -34,66 +34,76 @@ public class BoardsController {
 		Boards boardsPS = boardsDao.findById(id);
 		Users principal = (Users) session.getAttribute("principal");
 		// 비정상 요청 체크
-		if (boardsPS == null) { // if는 비정상 로직을 타게 해서 걸러내는 필터역할을 하는게 좋다.
+		if (boardsPS == null) {
 			return "errors/badPage";
 		}
-		// 인증체크
+		// 인증 체크
 		if (principal == null) {
 			return "redirect:/loginForm";
 		}
-		// 권한체크 (세션 principal.getId()와 boardsPS의 userId 비교)
+		// 권한 체크 ( 세션 principal.getId() 와 boardsPS의 userId를 비교)
 		if (principal.getId() != boardsPS.getUsersId()) {
 			return "errors/badPage";
 		}
+
 		// 2. 변경
 		boardsPS.글수정(updateDto);
+
 		// 3. 수행
-		boardsDao.update(boardsPS); // 핵심로직을 먼저 적는다.
-		return "redirect:/boards/"+id;
+		boardsDao.update(boardsPS);
+
+		return "redirect:/boards/" + id;
 	}
 
 	@GetMapping("/boards/{id}/updateForm")
 	public String updateForm(@PathVariable Integer id, Model model) {
-
 		Boards boardsPS = boardsDao.findById(id);
 		Users principal = (Users) session.getAttribute("principal");
 
 		// 비정상 요청 체크
-		if (boardsPS == null) { // if는 비정상 로직을 타게 해서 걸러내는 필터역할을 하는게 좋다.
+		if (boardsPS == null) {
 			return "errors/badPage";
 		}
-
-		// 인증체크
+		// 인증 체크
 		if (principal == null) {
 			return "redirect:/loginForm";
 		}
-
-		// 권한체크 (세션 principal.getId()와 boardsPS의 userId 비교)
+		// 권한 체크 ( 세션 principal.getId() 와 boardsPS의 userId를 비교)
 		if (principal.getId() != boardsPS.getUsersId()) {
 			return "errors/badPage";
 		}
 
 		model.addAttribute("boards", boardsPS);
+
 		return "boards/updateForm";
 	}
 
 	@PostMapping("/boards/{id}/delete")
 	public String deleteBoards(@PathVariable Integer id) {
+		Users principal = (Users) session.getAttribute("principal");
 		Boards boardsPS = boardsDao.findById(id);
 
 		// 비정상 요청 체크
-		if (boardsPS == null) { // if는 비정상 로직을 타게 해서 걸러내는 필터역할을 하는게 좋다.
+		if (boardsPS == null) { // if는 비정상 로직을 타게 해서 걸러내는 필터 역할을 하는게 좋다.
+			System.out.println("=================");
+			System.out.println("없는 번호를 요청하였습니다");
+			System.out.println("=================");
 			return "errors/badPage";
 		}
 
-		// 인증체크
-		Users principal = (Users) session.getAttribute("principal");
+		// 인증 체크
 		if (principal == null) {
+			System.out.println("=================");
+			System.out.println("로그인을 안하셨어요");
+			System.out.println("=================");
 			return "redirect:/loginForm";
 		}
 
-		// 권한체크 (세션 principal.getId()와 boardsPS의 userId 비교)
+		// 권한 체크 ( 세션 principal.getId() 와 boardsPS의 userId를 비교)
 		if (principal.getId() != boardsPS.getUsersId()) {
+			System.out.println("=================");
+			System.out.println("해당 글을 삭제할 권한이 없습니다");
+			System.out.println("=================");
 			return "redirect:/boards/" + id;
 		}
 
@@ -119,39 +129,38 @@ public class BoardsController {
 		return "redirect:/";
 	}
 
-	// http://localhost:8000/
-	// http://localhost:8000/?page=0
-	@GetMapping({ "/", "/boards" }) // 메인페이지
-	public String getBoardList(Model model, Integer page) { // 0 -> 0, 1->10, 2->20
-		if (page == null)
+	// 1번째 ?page=0&keyword=스프링
+	@GetMapping({ "/", "/boards" })
+	public String getBoardList(Model model, Integer page, String keyword) { // 0 -> 0, 1->10, 2->20
+		System.out.println("dddddddddd : keyword : "+keyword);
+		if (page == null) {
 			page = 0;
+		}
 		int startNum = page * 3;
+			
+		if (keyword == null || keyword.isEmpty()) {
+			System.out.println("=================================");
+			List<MainDto> boardsList = boardsDao.findAll(startNum);
+			PagingDto paging = boardsDao.paging(page, null);
+			paging.makeBlockInfo(keyword);
 
-		List<MainDto> boardsList = boardsDao.findAll(startNum);
-		PagingDto paging = boardsDao.paging(page);
-
-		// pagingUtil
-		// paging.set머시기로 dto 완성
-		final int blockCount = 5;
-		int currentBlock = page / blockCount;
-		int startPageNum = 1 + blockCount * currentBlock;
-		int lastPageNum = 5 + blockCount * currentBlock;
-
-		if (paging.getTotalPage() < lastPageNum) {
-			lastPageNum = paging.getTotalPage();
+			model.addAttribute("boardsList", boardsList);
+			model.addAttribute("paging", paging);	
+		} else {
+			
+			List<MainDto> boardsList = boardsDao.findSearch(startNum, keyword);
+			PagingDto paging = boardsDao.paging(page, keyword);
+			paging.makeBlockInfo(keyword);
+			
+			model.addAttribute("boardsList", boardsList);
+			model.addAttribute("paging", paging);
 		}
 
-		paging.setBlockCount(blockCount);
-		paging.setCurrentBlock(currentBlock);
-		paging.setStartPageNum(startPageNum);
-		paging.setLastPageNum(lastPageNum);
-
-		model.addAttribute("boardsList", boardsList);
-		model.addAttribute("paging", paging);
 		return "boards/main";
+	
 	}
 
-	@GetMapping("/boards/{id}") // 상세보기
+	@GetMapping("/boards/{id}")
 	public String getBoardDetail(@PathVariable Integer id, Model model) {
 		model.addAttribute("boards", boardsDao.findById(id));
 		return "boards/detail";
@@ -166,5 +175,4 @@ public class BoardsController {
 
 		return "boards/writeForm";
 	}
-
 }
