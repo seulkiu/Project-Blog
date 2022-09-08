@@ -9,7 +9,6 @@ import lombok.Setter;
 import site.metacoding.red.web.dto.request.boards.UpdateDto;
 
 @NoArgsConstructor
-@Setter
 @Getter
 public class Boards {
 	private Integer id;
