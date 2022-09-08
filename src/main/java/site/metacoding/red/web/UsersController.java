@@ -4,7 +4,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -21,6 +23,9 @@ public class UsersController {
 
 	private final UsersDao usersDao; // 컴퍼지션
 	private final HttpSession session; //스프링이 서버시작시에 IoC컨테이너에 보관함. 이것이 DI
+	
+//	@PostMapping("/users/{id}/update")
+//	public String update
 	
 	@GetMapping("/logout")
 	public String logout() {
@@ -54,5 +59,15 @@ public class UsersController {
 	@GetMapping("/joinForm")
 	public String joinForm() {
 		return "users/joinForm";
+	}
+	
+	@GetMapping("/users/{id}/updateForm")
+	public String updateForm(@PathVariable Integer id, Model model) {
+		Users usersPS = usersDao.findById(id);
+		Users principal = (Users) session.getAttribute("principal");
+		
+	
+		
+		return "users/updateForm";
 	}
 }
